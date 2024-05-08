@@ -1,6 +1,6 @@
 import pytest
 
-from src.domain.Entities.user_entity import UserEntity
+from src.domain.entities.user_entity import UserEntity
 
 
 @pytest.fixture()

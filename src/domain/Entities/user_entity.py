@@ -7,12 +7,12 @@ class UserEntity:
         self.email = email
         self.password = password
 
-    def __is_valid_email(self, value) -> str | None:
+    @classmethod
+    def __is_valid_email(cls, value) -> str | None:
         regex = re.compile(
             r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+'
         )
         r = re.fullmatch(regex, value)
-        print('r', r)
         return r
 
     @property

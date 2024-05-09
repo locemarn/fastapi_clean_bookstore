@@ -1,11 +1,43 @@
+import logging
 import re
 
+from sqlalchemy import insert, select
+from sqlalchemy.orm import Session
 
-class UserEntity:
-    def __init__(self, name, email, password):
-        self.name = name
+from src.domain.models.user_model import UserModel
+from src.domain.repositories.repository_interface import RepositoryInterface
+
+
+class UserEntity(RepositoryInterface):
+    def __init__(self, username, email, password):
+        self.username = username
         self.email = email
         self.password = password
+
+    def insert(self, db: Session):
+        try:
+            has_user = db.scalars(
+                select(UserModel).where(UserModel.email == self.email)
+            ).all()
+
+            if has_user:
+                raise ValueError(f'User {self.email} already exists')
+
+            new_user = UserModel(
+                username=self.username,
+                email=self.email,
+                password=self.password,
+            )
+            print('new_user', new_user)
+            db.execute(
+                insert(UserModel).returning(UserModel), [new_user.__dict__]
+            )
+            return {'user': new_user.__dict__}
+        except Exception as e:
+            logging.error('create_user entity exception')
+            logging.error(e)
+            db.rollback()
+            raise e
 
     @classmethod
     def __is_valid_email(cls, value) -> str | None:
@@ -16,8 +48,8 @@ class UserEntity:
         return r
 
     @property
-    def name(self):
-        return self._name
+    def username(self):
+        return self._username
 
     @property
     def email(self):
@@ -27,22 +59,22 @@ class UserEntity:
     def password(self):
         return self._password
 
-    @name.setter
-    def name(self, value):
+    @username.setter
+    def username(self, value):
         if type(value) is not str:
-            raise TypeError('Name must be a string')
+            raise TypeError('username must be a string')
 
-        if str(value) == '':
-            raise ValueError('Name cannot be empty')
+        if not str(value):
+            raise ValueError('username cannot be empty')
 
-        self._name = value
+        self._username = value
 
     @email.setter
     def email(self, value):
         if type(value) is not str:
             raise TypeError('Email must be a string')
 
-        if str(value) == '':
+        if not str(value):
             raise ValueError('Email cannot be empty')
 
         if not self.__is_valid_email(value):
@@ -55,7 +87,7 @@ class UserEntity:
         if type(value) is not str:
             raise TypeError('Password must be a string')
 
-        if str(value) == '':
+        if not str(value):
             raise ValueError('Password cannot be empty')
 
         self._password = value

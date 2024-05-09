@@ -24,12 +24,12 @@ class UserModel(Base):
         server_default=func.now(), onupdate=func.now()
     )
 
-    def __repr__(self) -> str:
-        return (
-            f'<User(id={self.id},'
-            f'username={self.username},'
-            f'email={self.email},'
-            f'password={self.password},'
-            f'created_at={self.created_at},'
-            f'updated_at={self.updated_at})>'
-        )
+    # def __repr__(self) -> str:
+    #     return (
+    #         f'<User(id={self.id},'
+    #         f'username={self.username},'
+    #         f'email={self.email},'
+    #         f'password={self.password},'
+    #         f'created_at={self.created_at},'
+    #         f'updated_at={self.updated_at})>'
+    #     )

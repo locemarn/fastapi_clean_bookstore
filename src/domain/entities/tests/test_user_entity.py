@@ -1,11 +1,7 @@
-from typing import Annotated
-
 import pytest
-from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from src.domain.entities.user_entity import UserEntity
-from src.infra.db.in_memory.tests.conftest import engine
 
 
 @pytest.fixture()
@@ -13,15 +9,6 @@ def user_entity() -> UserEntity:
     return UserEntity(
         username='test', email='test@email.com', password='secret'
     )
-
-
-@pytest.fixture()
-def get_session():
-    with Session(bind=engine) as session:
-        yield session
-
-
-db = Annotated[Session, Depends(get_session)]
 
 
 def test_user_entity_exception_username(user_entity: UserEntity):
@@ -85,8 +72,10 @@ def test_user_entity(user_entity: UserEntity):
 def test_user_entity_insert_user_exception(
     user_entity: UserEntity, session: Session
 ):
-    with pytest.raises(Exception) as e:
-        session = None
+    session = None
+    with pytest.raises(
+        Exception, match="'NoneType' object has no attribute 'rollback'"
+    ) as e:
         user_entity.insert(session)
     assert str(e.value) == "'NoneType' object has no attribute 'rollback'"
 
@@ -94,14 +83,16 @@ def test_user_entity_insert_user_exception(
 def test_user_entity_insert_user_exception_if_user_already_exist(
     user_entity: UserEntity, session: Session
 ):
-    with pytest.raises(ValueError) as e:
-        user_entity.insert(session)
+    user_entity.insert(session)
+    with pytest.raises(
+        ValueError, match=f'User {user_entity.email} already exists'
+    ) as e:
         user_entity.insert(session)
     assert str(e.value) == f'User {user_entity.email} already exists'
 
 
 def test_user_entity_insert_user(user_entity: UserEntity, session: Session):
     user = user_entity.insert(session)
-    assert user['user']['username'] == user_entity.username
-    assert user['user']['email'] == user_entity.email
-    assert user['user']['password'] == user_entity.password
+    assert user['user'].username == user_entity.username
+    assert user['user'].email == user_entity.email
+    assert user['user'].password == user_entity.password

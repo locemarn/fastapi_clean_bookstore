@@ -28,11 +28,10 @@ class UserEntity(RepositoryInterface):
                 email=self.email,
                 password=self.password,
             )
-            print('new_user', new_user)
-            db.execute(
+            res = db.scalars(
                 insert(UserModel).returning(UserModel), [new_user.__dict__]
-            )
-            return {'user': new_user.__dict__}
+            ).one()
+            return {'user': res}
         except Exception as e:
             logging.error('create_user entity exception')
             logging.error(e)

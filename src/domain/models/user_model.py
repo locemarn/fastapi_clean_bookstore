@@ -1,7 +1,18 @@
 from datetime import datetime
+from typing import Annotated
 
-from sqlalchemy import func
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import String, func
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    mapped_column,
+    validates,
+)
+
+timestamp = Annotated[
+    datetime,
+    mapped_column(nullable=False, server_default=func.CURRENT_TIMESTAMP()),
+]
 
 
 class Base(DeclarativeBase):
@@ -14,15 +25,31 @@ class UserModel(Base):
     id: Mapped[int] = mapped_column(
         primary_key=True, autoincrement=True, nullable=False
     )
-    username: Mapped[str]
-    email: Mapped[str]
-    password: Mapped[str]
-    created_at: Mapped[datetime] = mapped_column(
+    username: Mapped[str] = mapped_column(
+        String(50), unique=True, nullable=False
+    )
+    email: Mapped[str] = mapped_column(String(), unique=True, nullable=False)
+    password: Mapped[str] = mapped_column(String(30), nullable=False)
+    created_at: Mapped[timestamp] = mapped_column(
+        String,
+        nullable=False,
+        default=datetime.utcnow,
         server_default=func.now(),
     )
-    updated_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(), onupdate=func.now()
+    updated_at: Mapped[timestamp] = mapped_column(
+        String,
+        nullable=False,
+        default=datetime.utcnow,
+        server_default=func.now(),
+        onupdate=func.now(),
     )
+
+    @classmethod
+    @validates('email')
+    def validate_email(self, key, address):
+        if '@' not in address:
+            raise ValueError('failed simple email validation')
+        return address
 
     # def __repr__(self) -> str:
     #     return (

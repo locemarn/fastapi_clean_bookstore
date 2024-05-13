@@ -1,27 +1,11 @@
-# from typing import Annotated
-#
-# from fastapi import Depends
-# from sqlalchemy import select
+# from sqlalchemy import create_engine
 # from sqlalchemy.orm import Session
 #
-# from src.domain.entities.user_entity import UserEntity
-# from src.domain.models.user_model import UserModel
-# from src.domain.repositories.repository_interface import RepositoryInterface
-# from src.infra.db.in_memory.tests.conftest import session
+# from src.infra.db.settings import Settings
 #
-# Session = Annotated[Session, Depends(session)]
+# engine = create_engine(Settings().DATABASE_URL)
 #
 #
-# class UsersInMemoryRepository(RepositoryInterface):
-#     def __init__(self, db: Session) -> None:
-#         self.db = db
-#
-#     def insert(self, user: UserEntity) -> UserModel:
-#         # new_user = UserEntity(
-#         #     username='test',
-#         #     email='test@email.com',
-#         #     password='secret',
-#         # )
-#         u = self.db.scalars(select(UserModel))
-#         print('uuuu', u)
-#         return u
+# def get_session():
+#     with Session(bind=engine) as session:
+#         yield session

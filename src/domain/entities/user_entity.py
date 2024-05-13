@@ -1,43 +1,11 @@
-import logging
 import re
 
-from sqlalchemy import insert, select
-from sqlalchemy.orm import Session
 
-from src.domain.models.user_model import UserModel
-from src.domain.repositories.repository_interface import RepositoryInterface
-
-
-class UserEntity(RepositoryInterface):
+class UserEntity:
     def __init__(self, username, email, password):
         self.username = username
         self.email = email
         self.password = password
-
-    def insert(self, db: Session):
-        try:
-            has_user = db.scalars(
-                select(UserModel).where(UserModel.email == self.email)
-            ).all()
-
-            if has_user:
-                raise ValueError(f'User {self.email} already exists')
-
-            new_user = UserModel(
-                username=self.username,
-                email=self.email,
-                password=self.password,
-            )
-            print('new_user', new_user)
-            db.execute(
-                insert(UserModel).returning(UserModel), [new_user.__dict__]
-            )
-            return {'user': new_user.__dict__}
-        except Exception as e:
-            logging.error('create_user entity exception')
-            logging.error(e)
-            db.rollback()
-            raise e
 
     @classmethod
     def __is_valid_email(cls, value) -> str | None:

@@ -1,3 +1,5 @@
+import logging
+
 from sqlalchemy import insert
 
 from src.domain.models.user_model import UserModel
@@ -28,5 +30,7 @@ class UserRepository(RepositoryInterface):
                 )
                 return res.one()
             except Exception as exception:
+                logging.error('UserRepository - insert exception')
+                logging.error(exception)
                 db.session.rollback()
                 raise exception

@@ -1,25 +1,14 @@
-from sqlalchemy.orm import Session
+from src.application.controllers.controller_interface import (
+    ControllerInterface,
+)
+from src.application.use_cases.UseCaseInterface import UseCaseInterface
+from src.domain.schemas.schemas import UserSchemaInput
 
-from src.application.use_cases.user_insert_use_cases import UsersUseCases
 
+class UsersController(ControllerInterface):
+    def __init__(self, user_use_case: UseCaseInterface):
+        self.__user_use_case = user_use_case
 
-class UsersController:
-    def __init__(self, db: Session):
-        self.db = db
-
-    def insert_user(self, user: dict):
-        if not user['username']:
-            raise ValueError('Username cannot be empty')
-
-        if (
-            type(user['username'])
-            or type(user['email'])
-            or type(user['username'])
-        ) is not str:
-            raise ValueError('Data must be a string')
-
-        user_use_case = UsersUseCases()
-        response = user_use_case.insert(
-            user=user,
-        )
+    def handler_insert(self, user: UserSchemaInput) -> dict[str, str | int]:
+        response = self.__user_use_case.execute(user.__dict__)
         return response

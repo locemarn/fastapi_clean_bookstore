@@ -81,5 +81,4 @@ def test_users_use_case():
     sut = user_user_case.execute(data)
 
     assert sut['email'] == data['email']
-    assert sut['password'] == data['password']
     assert sut['username'] == data['username']

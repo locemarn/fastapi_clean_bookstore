@@ -18,11 +18,17 @@
 #
 #
 import pytest
+from faker import Faker
 from sqlalchemy import StaticPool, create_engine
 from sqlalchemy.orm import sessionmaker
+from starlette.testclient import TestClient
 
+from app import app
+from src.domain.entities.user_entity import UserEntity
 from src.domain.models.user_model import Base
 from src.infra.db.in_memory.in_memory_settings import InMemorySettings
+
+fake = Faker()
 
 
 @pytest.fixture(scope='session')
@@ -38,10 +44,19 @@ def session():
     Base.metadata.drop_all(engine)
 
 
-#
-#
-# @pytest.fixture()
-# def user_entity() -> UserEntity:
-#     return UserEntity(
-#         username='test', email='test@email.com', password='secret'
-#     )
+@pytest.fixture(scope='session')
+def client(session):
+    def get_session_override():
+        return session
+
+    with TestClient(app) as client:
+        yield client
+
+
+@pytest.fixture()
+def user_entity() -> UserEntity:
+    return UserEntity(
+        username=fake.user_name(),
+        email=fake.email(),
+        password=fake.password(),
+    )

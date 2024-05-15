@@ -8,7 +8,7 @@ fake = Faker()
 
 
 class UserRepositorySpy:
-    def __init__(self) -> any:
+    def __init__(self):
         self.insert_user_attributes = {}
         self.select_user_attributes = {}
 

@@ -12,6 +12,15 @@ class UserRepository(RepositoryInterface):
     def insert(cls, data: dict[str, str]) -> UserModel:
         with DatabaseConnection() as db:
             try:
+                if not data['email'] or type(data['email']) is not str:
+                    raise TypeError('Email must be a string')
+
+                if not data['password'] or type(data['password']) is not str:
+                    raise TypeError('Password must be a string')
+
+                if not data['username'] or type(data['username']) is not str:
+                    raise TypeError('Username must be a string')
+
                 new_user = UserModel(
                     email=data['email'],
                     username=data['username'],

@@ -1,0 +1,28 @@
+name: Pipeline
+on: [push, pull_request]
+
+env:
+  DATABASE_URL: ${{vars.DATABASE_URL}}
+  DATABASE_URL_TEST: ${{vars.DATABASE_URL_TEST}}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Copying the git repository
+        uses: actions/checkout@v4
+
+      - name: Install python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install project dependencies
+        run: poetry install
+
+      - name: Run the tests
+        run: poetry run task test

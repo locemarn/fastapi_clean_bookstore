@@ -24,5 +24,8 @@ jobs:
       - name: Install project dependencies
         run: poetry install
 
+      - name: format code
+        run: poetry run task format
+
       - name: Run the tests
         run: poetry run task test

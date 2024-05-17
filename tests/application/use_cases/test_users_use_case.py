@@ -19,66 +19,55 @@ class UserRepositorySpy:
         return self.select_user(self.insert_user_attributes)
 
     def select_user(self, attributes: dict) -> UserModel:
-        self.select_user_attributes['username'] = attributes['username']
+        # self.select_user_attributes['username'] = attributes['username']
         return UserModel(**attributes)
 
 
-def test_users_use_case_username_error():
-    data: dict[str, str] = {
-        'email': str(fake.email()),
-        'username': str(fake.user_name()),
-        'password': str(fake.password()),
-    }
+def test_users_use_case_username_error(new_user_dict):
+    print('new_user_dict', new_user_dict)
+
     repo = UserRepositorySpy()
-    data['username'] = 3
-    repo.select_user(data)
+    username = new_user_dict['username']
+    new_user_dict['username'] = 3
+    repo.select_user(new_user_dict)
     user_user_case = UserInsertUseCase(repo)
 
     with pytest.raises(ValueError, match='Invalid username') as e:
-        user_user_case.execute(data)
+        user_user_case.execute(new_user_dict)
     assert str(e.value) == 'Invalid username'
+    new_user_dict['username'] = username
 
 
-def test_users_use_case_password_error():
-    data: dict[str, str] = {
-        'email': str(fake.email()),
-        'username': str(fake.user_name()),
-        'password': str(fake.password()),
-    }
+def test_users_use_case_password_error(new_user_dict):
     repo = UserRepositorySpy()
-    data['password'] = 3
-    repo.select_user(data)
+    password = new_user_dict['password']
+    new_user_dict['password'] = 3
+    repo.select_user(new_user_dict)
     user_user_case = UserInsertUseCase(repo)
     with pytest.raises(ValueError, match='Invalid password') as e:
-        user_user_case.execute(data)
+        user_user_case.execute(new_user_dict)
+    print(e.value)
     assert str(e.value) == 'Invalid password'
+    new_user_dict['password'] = password
 
 
-def test_users_use_case_mail_error():
-    data: dict[str, str] = {
-        'email': str(fake.email()),
-        'username': str(fake.user_name()),
-        'password': str(fake.password()),
-    }
+def test_users_use_case_mail_error(new_user_dict):
     repo = UserRepositorySpy()
-    data['email'] = 3
-    repo.select_user(data)
+    email = new_user_dict['email']
+    new_user_dict['email'] = 3
+    repo.select_user(new_user_dict)
     user_user_case = UserInsertUseCase(repo)
     with pytest.raises(ValueError, match='Invalid email') as e:
-        user_user_case.execute(data)
+        user_user_case.execute(new_user_dict)
     assert str(e.value) == 'Invalid email'
+    new_user_dict['email'] = email
 
 
-def test_users_use_case():
-    data: dict[str, str] = {
-        'email': str(fake.email()),
-        'username': str(fake.user_name()),
-        'password': str(fake.password()),
-    }
+def test_users_use_case(new_user_dict):
     repo = UserRepositorySpy()
-    repo.select_user(data)
+    repo.select_user(new_user_dict)
     user_user_case = UserInsertUseCase(repo)
-    sut = user_user_case.execute(data)
+    sut = user_user_case.execute(new_user_dict)
 
-    assert sut['email'] == data['email']
-    assert sut['username'] == data['username']
+    assert sut['email'] == new_user_dict['email']
+    assert sut['username'] == new_user_dict['username']

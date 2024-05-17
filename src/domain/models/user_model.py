@@ -1,12 +1,11 @@
 from datetime import datetime
 from typing import Annotated
 
-from sqlalchemy import String, func
+from sqlalchemy import Integer, String, func
 from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
     mapped_column,
-    validates,
 )
 
 timestamp = Annotated[
@@ -23,13 +22,13 @@ class UserModel(Base):
     __tablename__ = 'users'
 
     id: Mapped[int] = mapped_column(
-        primary_key=True, autoincrement=True, nullable=False
+        Integer, primary_key=True, autoincrement=True, nullable=False
     )
     username: Mapped[str] = mapped_column(
         String(50), unique=True, nullable=False
     )
-    email: Mapped[str] = mapped_column(String(), unique=True, nullable=False)
-    password: Mapped[str] = mapped_column(String(30), nullable=False)
+    email: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    password: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[timestamp] = mapped_column(
         String,
         nullable=False,
@@ -44,19 +43,33 @@ class UserModel(Base):
         onupdate=func.now(),
     )
 
-    @classmethod
-    @validates('email')
-    def validate_email(self, key, address):
-        if '@' not in address:
-            raise ValueError('failed simple email validation')
-        return address
+    # @classmethod
+    # @validates('email')
+    # def validate_email(cls, key, address):
+    #     print('key', key)
+    #     print('address', address)
+    #
+    #     if '@' not in address:
+    #         raise ValueError('failed simple email validation')
+    #     return address
 
-    # def __repr__(self) -> str:
-    #     return (
-    #         f'<User(id={self.id},'
-    #         f'username={self.username},'
-    #         f'email={self.email},'
-    #         f'password={self.password},'
-    #         f'created_at={self.created_at},'
-    #         f'updated_at={self.updated_at})>'
-    #     )
+
+# @classmethod
+# @validates('email')
+# def validate_email(cls, key, email: str):
+#     print('email', email)
+#     if not email or type(email) is not str:
+#         raise ValueError('Username cannot be empty')
+#     return email.strip()
+#
+#
+# @event.listens_for(UserModel, 'before_insert')
+# def before_insert(mapper, connection, target):
+#     print('akiiiiiii', type(target.username) is not str)
+#     if not target.username or type(target.username) is not str:
+#         print('akiiiiiii')
+#         raise ValueError('Username cannot be empty 2')
+#
+#     print('mapper', mapper)
+#     print('connection', connection)
+#     print('target', target)

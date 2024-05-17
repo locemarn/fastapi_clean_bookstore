@@ -12,17 +12,6 @@ from src.domain.schemas.schemas import UserSchemaInput, UserSchemaOutput
 router = APIRouter(prefix='/users', tags=['users'])
 
 
-# @router.get("/users", response_model=List[schemas.User])
-
-# ResponseCreateUserType = TypedDict('ResponseCreateUserType', {
-#     'id': int,
-#     'username': str,
-#     'email': str,
-#     'created_at': str,
-#     'updated_at': str
-# })
-
-
 @router.get('/')
 async def get_users():
     return {'users': 'get_users'}

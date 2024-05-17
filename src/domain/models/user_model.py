@@ -43,33 +43,17 @@ class UserModel(Base):
         onupdate=func.now(),
     )
 
-    # @classmethod
-    # @validates('email')
-    # def validate_email(cls, key, address):
-    #     print('key', key)
-    #     print('address', address)
-    #
-    #     if '@' not in address:
-    #         raise ValueError('failed simple email validation')
-    #     return address
 
+# @event.listens_for(UserModel, 'init_scalar', retval=True, propagate=True)
+# def before_insert(target, dict_, value):
+#     print('instance', target)
+#     print('instance', dict_)
+#
+#     print('instance', value)
 
-# @classmethod
-# @validates('email')
-# def validate_email(cls, key, email: str):
-#     print('email', email)
-#     if not email or type(email) is not str:
-#         raise ValueError('Username cannot be empty')
-#     return email.strip()
-#
-#
-# @event.listens_for(UserModel, 'before_insert')
-# def before_insert(mapper, connection, target):
-#     print('akiiiiiii', type(target.username) is not str)
-#     if not target.username or type(target.username) is not str:
-#         print('akiiiiiii')
-#         raise ValueError('Username cannot be empty 2')
-#
-#     print('mapper', mapper)
-#     print('connection', connection)
-#     print('target', target)
+# to_validate_data = {
+#     'username': instance.username,
+#     'email': instance.email,
+#     'password': instance.password,
+# }
+# user_insert_validator(to_validate_data)

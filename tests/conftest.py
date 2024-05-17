@@ -5,7 +5,6 @@ from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
 
 from app import app
-from src.domain.entities.user_entity import UserEntity
 from src.domain.models.user_model import Base, UserModel
 from src.infra.db.in_memory.in_memory_settings import InMemorySettings
 
@@ -32,15 +31,6 @@ def client(session):
 
     with TestClient(app) as client:
         yield client
-
-
-@pytest.fixture()
-def user_entity() -> UserEntity:
-    return UserEntity(
-        username=fake.user_name(),
-        email=fake.email(),
-        password=fake.password(),
-    )
 
 
 @pytest.fixture(scope='session')

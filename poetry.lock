@@ -51,6 +51,17 @@ test = ["anyio[trio]", "coverage[toml] (>=7)", "exceptiongroup (>=1.2.0)", "hypo
 trio = ["trio (>=0.23)"]
 
 [[package]]
+name = "cerberus"
+version = "1.3.5"
+description = "Lightweight, extensible schema and data validation tool for Pythondictionaries."
+optional = false
+python-versions = "*"
+files = [
+    {file = "Cerberus-1.3.5-py3-none-any.whl", hash = "sha256:7649a5815024d18eb7c6aa5e7a95355c649a53aacfc9b050e9d0bf6bfa2af372"},
+    {file = "Cerberus-1.3.5.tar.gz", hash = "sha256:81011e10266ef71b6ec6d50e60171258a5b134d69f8fb387d16e4936d0d47642"},
+]
+
+[[package]]
 name = "certifi"
 version = "2024.2.2"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -1389,6 +1400,20 @@ docs = ["Sphinx (>=4.1.2,<4.2.0)", "sphinx-rtd-theme (>=0.5.2,<0.6.0)", "sphinxc
 test = ["Cython (>=0.29.36,<0.30.0)", "aiohttp (==3.9.0b0)", "aiohttp (>=3.8.1)", "flake8 (>=5.0,<6.0)", "mypy (>=0.800)", "psutil", "pyOpenSSL (>=23.0.0,<23.1.0)", "pycodestyle (>=2.9.0,<2.10.0)"]
 
 [[package]]
+name = "validator"
+version = "0.7.1"
+description = "Python Validator"
+optional = false
+python-versions = "*"
+files = [
+    {file = "validator-0.7.1-py3-none-any.whl", hash = "sha256:bd333e36c1bd07dfa8ad0ecc64d141cbc1863d07e033ab84eada333cb154f4bd"},
+    {file = "validator-0.7.1.tar.gz", hash = "sha256:926714169dc82a233a68041c395bc12e49d2c4cd7d6103ff3fb3565bd7f66d06"},
+]
+
+[package.dependencies]
+python-dateutil = "*"
+
+[[package]]
 name = "watchdog"
 version = "4.0.0"
 description = "Filesystem events monitoring"
@@ -1600,4 +1625,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11.9"
-content-hash = "4694dcbcdf943e39b4bc73c2be0c380bb163943e4682363e4671ffd7d0c4667d"
+content-hash = "0aa5b74d84e5965e50e96711bd6421699401a2b31802c86c8b9b2ee544a88714"

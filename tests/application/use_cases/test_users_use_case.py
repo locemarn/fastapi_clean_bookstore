@@ -18,6 +18,7 @@ class UserRepositorySpy:
         self.insert_user_attributes['password'] = attributes['password']
         return self.select_user(self.insert_user_attributes)
 
+    @classmethod
     def select_user(self, attributes: dict) -> UserModel:
         # self.select_user_attributes['username'] = attributes['username']
         return UserModel(**attributes)

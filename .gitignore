@@ -136,3 +136,5 @@ dmypy.json
 .idea/workspace.xmldatabase.db
 
 migrations
+database.db
+test.db

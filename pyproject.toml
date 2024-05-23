@@ -46,6 +46,7 @@ quote-style = 'single'
 [tool.pytest.ini_options]
 pythonpath = '.'
 addopts = '-p no:warnings'
+mock_use_standalone_module = true
 
 [pytest-watch]
 ignore = './integration-tests'

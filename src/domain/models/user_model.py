@@ -6,6 +6,7 @@ from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
     mapped_column,
+    registry,
 )
 
 timestamp = Annotated[
@@ -13,16 +14,23 @@ timestamp = Annotated[
     mapped_column(nullable=False, server_default=func.CURRENT_TIMESTAMP()),
 ]
 
+table_registry = registry()
+
 
 class Base(DeclarativeBase):
     pass
 
 
-class UserModel(Base):
+@table_registry.mapped_as_dataclass
+class UserModel:
     __tablename__ = 'users'
 
     id: Mapped[int] = mapped_column(
-        Integer, primary_key=True, autoincrement=True, nullable=False
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+        nullable=False,
+        init=False,
     )
     username: Mapped[str] = mapped_column(
         String(50), unique=True, nullable=False
@@ -41,19 +49,5 @@ class UserModel(Base):
         default=datetime.utcnow,
         server_default=func.now(),
         onupdate=func.now(),
+        init=False,
     )
-
-
-# @event.listens_for(UserModel, 'init_scalar', retval=True, propagate=True)
-# def before_insert(target, dict_, value):
-#     print('instance', target)
-#     print('instance', dict_)
-#
-#     print('instance', value)
-
-# to_validate_data = {
-#     'username': instance.username,
-#     'email': instance.email,
-#     'password': instance.password,
-# }
-# user_insert_validator(to_validate_data)

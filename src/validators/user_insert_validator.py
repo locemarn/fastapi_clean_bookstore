@@ -6,7 +6,6 @@ from src.errors.types.http_unprocessable_entity import (
 
 
 def user_insert_validator(user):
-    print('---------------<> user', user)
     body_validator = Validator({
         'username': {
             'type': 'string',
@@ -27,13 +26,10 @@ def user_insert_validator(user):
             'maxlength': 50,
             'required': True,
             'empty': False,
-            'regex':
-                r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+',
+            'regex': r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+',
         },
     })
     response = body_validator.validate(user)
-
-    # print('body_validator', body_validator.validate)
 
     if response is False:
         raise HttpUnprocessableEntityError(body_validator.errors)

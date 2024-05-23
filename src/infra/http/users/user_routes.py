@@ -1,38 +1,67 @@
 import logging
 from http import HTTPStatus
+from typing import List
 
 from fastapi import APIRouter
 
 from src.application.controllers.users_controller import UsersController
-from src.application.use_cases.user_insert_use_cases import UserInsertUseCase
-from src.domain.repositories.user_repository import UserRepository
 from src.domain.schemas.schemas import UserSchemaInput, UserSchemaOutput
 from src.errors.error_handler import handle_error
+from src.infra.repositories.user_repository import UserRepository
 from src.validators.user_insert_validator import user_insert_validator
 
 router = APIRouter(prefix='/users', tags=['users'])
 
 
-@router.get('/')
-async def get_users():
-    return {'users': 'get_users'}
+@router.get(
+    '/', response_model=List[UserSchemaOutput], status_code=HTTPStatus.OK
+)
+def get_users():
+    http_response = None
+    try:
+        user_repository = UserRepository()
+        user_controller = UsersController(user_repository)
+        http_response = user_controller.get_all_users()
+        return http_response
+    except Exception as e:
+        logging.error('get_users route exception')
+        logging.error(e)
+        http_response = handle_error(e)
+    finally:
+        return http_response
 
 
 @router.post(
     '/', response_model=UserSchemaOutput, status_code=HTTPStatus.CREATED
 )
-async def create_user(user: UserSchemaInput):
+def create_user(user: UserSchemaInput):
+    http_response = None
     try:
         user_insert_validator(user.__dict__)
-        repository = UserRepository()
-        user_case = UserInsertUseCase(repository)
-        controller = UsersController(user_case)
-        http_response = controller.handler_insert(user)
-        return http_response
+        user_repository = UserRepository()
+        user_controller = UsersController(user_repository)
+        http_response = user_controller.insert_new_user(user.__dict__)
     except Exception as e:
         logging.error('create_user route exception')
         logging.error(e)
         http_response = handle_error(e)
+    finally:
+        return http_response
 
-    print('http_response', http_response)
-    return http_response['body'], http_response['status_code']
+
+@router.delete(
+    '/{user_id}', response_model=UserSchemaOutput, status_code=HTTPStatus.OK
+)
+def delete_user(user_id: str):
+    http_response = None
+    try:
+        int_user_id = int(user_id)
+        user_repository = UserRepository()
+        user_controller = UsersController(user_repository)
+        http_response = user_controller.delete_user(int_user_id)
+    except Exception as e:
+        logging.error('delete_user route exception')
+        logging.error(e)
+        http_response = handle_error(e)
+    finally:
+        return http_response

@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session, registry, sessionmaker
 
 from src.infra.db.settings import Settings
 
+# from src.infra.db.settings import Settings
+
 
 class DatabaseConnection:
     def __init__(self):
@@ -12,7 +14,7 @@ class DatabaseConnection:
         self.__table_registry = registry()
 
     def __create_database_engine(self):
-        engine = create_engine(self.__connection_string)
+        engine = create_engine(self.__connection_string, echo=True)
         return engine
 
     def get_engine(self):
@@ -21,7 +23,9 @@ class DatabaseConnection:
         # return self.__engine
 
     def __enter__(self):
-        session_make = sessionmaker(bind=self.__engine)
+        session_make = sessionmaker(
+            bind=self.__engine, autoflush=False, autocommit=False
+        )
         self.session = session_make()
         self.__table_registry.metadata.create_all(bind=self.__engine)
         self.__table_registry.metadata.drop_all(bind=self.__engine)

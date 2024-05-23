@@ -1,77 +1,93 @@
 import pytest
 from faker import Faker
-from sqlalchemy import StaticPool, create_engine
-from sqlalchemy.orm import sessionmaker
-from starlette.testclient import TestClient
+from sqlalchemy import StaticPool, create_engine, delete
+from sqlalchemy.orm import Session
 
-from app import app
-from src.domain.models.user_model import Base, UserModel
+from src.domain.models.user_model import UserModel, table_registry
+from src.infra.db.database import DatabaseConnection
 from src.infra.db.in_memory.in_memory_settings import InMemorySettings
+from tests.infra.repositories.in_memory_user_repository import (
+    InMemoryUserRepository,
+)
 
 fake = Faker()
+
+db = DatabaseConnection()
+local_db = db.get_engine()
+
+
+# @pytest.fixture()
+# def client(session):
+#     def get_session_override():
+#         local = session
+#         yield local
+#         local.rollback()
+#
+#     with TestClient(app) as client:
+#         app.dependency_overrides[local_db] = get_session_override
+#         yield client
+#
+#     app.dependency_overrides.clear()
 
 
 @pytest.fixture(scope='session')
 def session():
+    uri = str(InMemorySettings().DATABASE_URL_TEST)
     engine = create_engine(
-        InMemorySettings().DATABASE_URL_TEST,
+        uri,
         connect_args={'check_same_thread': False},
         poolclass=StaticPool,
     )
-    session = sessionmaker(bind=engine)
-    Base.metadata.create_all(engine)
-    yield session()
-    Base.metadata.drop_all(engine)
+    table_registry.metadata.create_all(engine)
+
+    with Session(engine) as session:
+        print('session created', session)
+        yield session
+        session.rollback()
+
+    table_registry.metadata.drop_all(engine)
+
+
+# @pytest.fixture(scope='session')
+# def session():
+#     engine = create_engine(
+#         InMemorySettings().DATABASE_URL_TEST,
+#         connect_args={'check_same_thread': False},
+#         poolclass=StaticPool,
+#     )
+#     session_local = sessionmaker(
+#         bind=engine, autoflush=False, autocommit=False
+#     )
+#     table_registry.metadata.create_all(bind=engine)
+#
+#     with Session(engine) as session:
+#         db_local = session
+#         try:
+#             yield db_local
+#         finally:
+#             db_local.close()
+#     # yield session()
+#     table_registry.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture(scope='session')
-def client(session):
-    def get_session_override():
-        return session
-
-    with TestClient(app) as client:
-        yield client
+def in_memory_repository(session):
+    repo = InMemoryUserRepository(session)
+    return repo
 
 
-@pytest.fixture(scope='session')
-def new_user_model() -> UserModel:
-    email = fake.email()
-    username = fake.user_name()
-    password = fake.password()
-    new_user = UserModel(
-        email=email,
-        username=username,
-        password=password,
-    )
-    return new_user
+@pytest.fixture(autouse=True)
+def before_each_user_test(session: Session):
+    res = session.execute(delete(UserModel))
+    yield res
+    session.close()
 
 
-@pytest.fixture(scope='session')
-def new_user_dict() -> dict[str, str]:
-    data = {
-        'email': str(fake.email()),
-        'username': str(fake.user_name()),
-        'password': str(fake.password()),
-    }
-    return data
-
-
-@pytest.fixture(scope='session', autouse=True)
-def create_user_dict(new_user_dict) -> dict[str, str]:
-    print('fixture new_user_dict ---->', new_user_dict)
-    new_user_dict = {
-        'email': str(fake.email()),
-        'username': str(fake.user_name()),
-        'password': str(fake.password()),
-    }
-    return new_user_dict
-
-
-@pytest.fixture(scope='session')
-def reset_new_user_dict() -> dict[str, str]:
-    data: dict[str, str] = {
-        'email': str(fake.email()),
-        'username': str(fake.user_name()),
-        'password': str(fake.password()),
-    }
-    return data
+# @pytest.fixture(scope='session')
+# def client(session: Session):
+#     with TestClient(app) as client:
+#         with DatabaseConnection() as db:
+#             # db = DatabaseConnection()
+#             app.dependency_overrides[db.get_engine()] = override_test_db
+#             yield client
+#     app.dependency_overrides.clear()
